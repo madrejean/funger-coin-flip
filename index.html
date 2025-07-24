@@ -191,9 +191,7 @@
     }
 
     function setAutoToss(coinPic) {
-        var evtobj = window.event;
-        console.log(evtobj);
-        evtobj.preventDefault();
+        // i hate myself
         if (coinPic.dataset.autoToss == "true") {
             coinPic.dataset.autoToss == "false";
         }
@@ -232,7 +230,7 @@
         
         const imgElement = document.createElement("img");
         container.appendChild(imgElement);
-        imgElement.outerHTML = `<img class="coinPicture" data-auto-toss="false" data-animation-playing="false" data-audio-player-id="coinAudioPlayer${newAudioPlayerId}" onclick="flipCoin(this)" onrightclick="setAutoToss(this)">`;
+        imgElement.outerHTML = `<img class="coinPicture" data-auto-toss="false" data-animation-playing="false" data-audio-player-id="coinAudioPlayer${newAudioPlayerId}" onclick="flipCoin(this)">`;
         
         // apparently after setting the outer html, the element kills itself and the imgelement stays old, so i need to get an updated version. html is so weird man
         const newImgElement = container.querySelector(`.coinPicture[data-audio-player-id="coinAudioPlayer${newAudioPlayerId}"]`);

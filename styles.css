@@ -1,3 +1,7 @@
+:root {
+    --coin-count: 1;
+}
+
 body {
     display: flex;
     flex-direction: column;
@@ -26,13 +30,16 @@ body {
 }
 
 .statsMenu {
+    width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 1em;
+
+    overflow: hidden;
+    user-select: none;
 
     position: absolute;
-    left: 2em;
-    bottom: 2em;
+    left: 0em;
+    bottom: 0em;
 
     opacity: 0.0;
     transition: opacity 0.2s ease;
@@ -43,11 +50,71 @@ body {
     opacity: 1.0;
 }
 
-.coinPicture {
-    width: 30vw;
-    min-width: 300px;
-    image-rendering: pixelated;
+.statsMenuDecoration {
+    position: absolute;
+    z-index: -1;
+    opacity: 0.025;
+    user-select: none;
+    pointer-events: none;
 }
+.statsMenuDecorationLine {
+    overflow: hidden;
+    white-space: nowrap;
+    
+    animation-duration: 10s;
+    animation-iteration-count: infinite;
+    animation-name: statsMenuDecorationItemAnimation;
+    animation-timing-function: linear;
+    
+    text-align: center;
+
+    font-size: 4em;
+    width: 4em;
+    height: 2em;
+}
+@keyframes statsMenuDecorationItemAnimation {
+	from {
+		transform: translateX( 0em );
+	}
+	to {
+		transform: translateX( -16em );
+	}
+}
+
+.coinPicture {
+    position: relative;
+    width: 30vw;
+    min-width: 250px;
+    image-rendering: pixelated;
+    user-select: none;
+    z-index: 1;
+    margin-top: -100px;
+}
+.coinPicture:nth-child(-n + 5) {
+    margin-top: 100px;
+}
+
+.coinContainer {
+    /* display: flex;
+    flex-direction: row; */
+    overflow: auto;
+    display: grid;
+    grid-template-columns: repeat(var(--coin-count), 20vw);
+    @media (width < 800px) {
+        column-gap: 10vw;
+        grid-template-columns: repeat(var(--coin-count), 20vw);
+    }
+    justify-items: center;
+    position: fixed;
+    align-items: center;
+    align-content: baseline;
+    justify-content: center;
+    right: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
+}
+/* .coinContainer: */
 
 @font-face {
   font-family: CrimsonText;

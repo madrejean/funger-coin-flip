@@ -7,6 +7,9 @@ const translations = {
         "statsCountAllLabel": "ВСЕГО:",
         "statsCountHeadsLabel": "ОРЛОВ:",
         "statsCountTailsLabel": "РЕШЕК:",
+        "statsMenuDecorationLine0": "ОРЁЛ",
+        "statsMenuDecorationLine1": "РЕШКА",
+        "statsMenuDecorationLine2": "ИЛИ",
     },
     "en": {
         "title": "LUCKY COIN",
@@ -15,6 +18,9 @@ const translations = {
         "statsCountAllLabel": "ALL:",
         "statsCountHeadsLabel": "HEADS:",
         "statsCountTailsLabel": "TAILS:",
+        "statsMenuDecorationLine0": "HEADS",
+        "statsMenuDecorationLine1": "TAILS",
+        "statsMenuDecorationLine2": "OR",
     }
 };
 

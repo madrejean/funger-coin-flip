@@ -53,60 +53,92 @@
 </head>
 
 <body>
-    <div style="position: fixed; left: 20vw; right: 20vw; top: 0; bottom: 6vw; z-index: 1;" onclick="flipCoin(picture)"></div>
-    <div style="position: fixed; left: 20vw; right: 20vw; top: calc(100% - 6vw); bottom: 0; z-index: 1;" onclick="showMenu()"></div>
-    <div class="hbox" style=" position: fixed; align-items: center; justify-content: center; right: 0; left: 0; top: 0; bottom: 0;">
-        <img class="coinPicture" id="coinPicture">
-        <!-- <img src="assets/animations/coin_flip/0.png" style="margin-top: 10vw; height: 100vw; image-rendering: pixelated;"> -->
+    <!-- <div style="position: fixed; left: 20vw; right: 20vw; top: 0; bottom: 6vw; z-index: 10;" onclick="flipCoin(picture)"></div> -->
+    <div style="position: fixed; left: 20vw; right: 20vw; top: calc(100% - 6vw); bottom: 0; z-index: 10;" onclick="showMenu()"></div>
+    <div class="coinContainer">
+
+        <!-- <img class="coinPicture" data-auto-toss="false" data-animation-playing="false" data-audio-player-id="coinAudioPlayer1" onclick="flipCoin(this)">
+            <audio id="coinAudioPlayer1" src="assets/audio/flip.mp3"></audio> -->
+        
     </div>
-    <audio id="flipAudioPlayer" src="assets/audio/flip.mp3" autoplay></audio>
+    
     <audio id="menuAudioPlayer" src="assets/audio/menu_open.mp3"></audio>
 
     <div id="statsMenu" class="statsMenu" style="z-index: 2; color: white;">
-        <div class="hbox" style="gap: 1em; font-size: larger;">
-            <label data-i18n-key="statsCountAllLabel"></label>
-            <label id="statsCountAllLabel">0</label>
+        <div style="margin-left: 2em; margin-bottom: 2em;">
+            <div class="hbox" style="gap: 1em; font-size: x-large;">
+                <label data-i18n-key="statsCountAllLabel"></label>
+                <label id="statsCountAllLabel">0</label>
+            </div>
+            <div class="hbox" style="gap: 1em;">
+                <label data-i18n-key="statsCountHeadsLabel"></label>
+                <label id="statsCountHeadsLabel">0</label>
+            </div>
+            <div class="hbox" style="gap: 1em;">
+                <label data-i18n-key="statsCountTailsLabel"></label>
+                <label id="statsCountTailsLabel">0</label>
+            </div>
         </div>
-        <div class="hbox" style="gap: 1em;">
-            <label data-i18n-key="statsCountHeadsLabel"></label>
-            <label id="statsCountHeadsLabel">0</label>
-        </div>
-        <div class="hbox" style="gap: 1em;">
-            <label data-i18n-key="statsCountTailsLabel"></label>
-            <label id="statsCountTailsLabel">0</label>
+        
+        <div class="hbox statsMenuDecoration">
+            <div class="statsMenuDecorationLine" data-i18n-key="statsMenuDecorationLine0"></div>
+            <div class="statsMenuDecorationLine" data-i18n-key="statsMenuDecorationLine2"></div>
+            <div class="statsMenuDecorationLine" data-i18n-key="statsMenuDecorationLine1"></div>
+            <div class="statsMenuDecorationLine" data-i18n-key="statsMenuDecorationLine2"></div>
+            <div class="statsMenuDecorationLine" data-i18n-key="statsMenuDecorationLine0"></div>
+            <div class="statsMenuDecorationLine" data-i18n-key="statsMenuDecorationLine2"></div>
+            <div class="statsMenuDecorationLine" data-i18n-key="statsMenuDecorationLine1"></div>
+            <div class="statsMenuDecorationLine" data-i18n-key="statsMenuDecorationLine2"></div>
+            <div class="statsMenuDecorationLine" data-i18n-key="statsMenuDecorationLine0"></div>
+            <div class="statsMenuDecorationLine" data-i18n-key="statsMenuDecorationLine2"></div>
+            <div class="statsMenuDecorationLine" data-i18n-key="statsMenuDecorationLine1"></div>
         </div>
     </div>
 </body>
 
 <script>
-    const picture = document.getElementById("coinPicture");
-    const flipAudioPlayer = document.getElementById("flipAudioPlayer");
     const menuAudioPlayer = document.getElementById("menuAudioPlayer");
     const statsMenu = document.getElementById("statsMenu");
+    const root = document.documentElement;
     const animationsJson = loadAnimationsJson();
 
     const animationMsDelay = 78;
+    var speedMultiplier = 1.0;
+    var playingOneSound = false;
         
     var randValue = 0;
-    var playingAnimation = false;
 
+    var countAll = 0;
     var countHeads = 0;
     var countTails = 0;
 
-    function flipCoin(pic) {
-        if (playingAnimation) return;
-        randValue = getRandomInclusive(0, 1);
+    function flipCoin(coinPic, playOneSound = false) {
+        if (coinPic.dataset.animationPlaying == "true") return;
 
         animationsJson.then(data => {
             if (data === null) console.log("no data");
             else if (data) {
-                playingAnimation = true;
+                coinPic.dataset.animationPlaying = true;
 
-                let animationIndex = randValue;
+                var coinPicZIndex = coinPic.style.zIndex;
+                coinPic.style.zIndex = "0";
+
+                let animationIndex = getRandomInclusive(0, 1);
                 
                 let framesData = [];
+                
+                let flipAudioPlayer = document.getElementById(coinPic.dataset.audioPlayerId);
+                if (flipAudioPlayer && !playingOneSound){
+                    // if (playOneSound){
+                    //     playingOneSound = true;
+                    // }
 
-                flipAudioPlayer.play();
+                    flipAudioPlayer.pause();
+                    flipAudioPlayer.currentTime = 0;
+                    flipAudioPlayer.playbackRate = speedMultiplier;
+                    flipAudioPlayer.play();
+                }
+                playingOneSound = playOneSound;
                 addAllVisually();
                 
                 for (let i = 0; i < data[animationIndex].frames.length; i++) {
@@ -125,13 +157,12 @@
                 }
                 for (let i = 0; i < framesData.length; i++) {
                     let func = () => {
-                        pic.src = `assets/animations/${data[animationIndex].animationName}/${framesData[i].frameImageName}.png`;
-                        pic.style.position = "relative";
-                        pic.style.left = framesData[i].x/10.0 + "vw";
-                        pic.style.top = framesData[i].y/5.0 + "%";
-                        pic.style.scale = (framesData[i].scale * 100.0/130.0) + "%";
-                        pic.style.rotate = framesData[i].rotate + "deg";
-                        pic.style.opacity = framesData[i].isVisible ? framesData[i].opacity / 255.0 : 0.0;
+                        coinPic.src = `assets/animations/${data[animationIndex].animationName}/${framesData[i].frameImageName}.png`;
+                        coinPic.style.left = framesData[i].x/10.0 + "vw";
+                        coinPic.style.top = framesData[i].y/5.0 + "%";
+                        coinPic.style.scale = (framesData[i].scale * 100.0/130.0) + "%";
+                        coinPic.style.rotate = framesData[i].rotate + "deg";
+                        coinPic.style.opacity = framesData[i].isVisible ? framesData[i].opacity / 255.0 : 0.0;
 
                         if (i >= 35) {
                             document.title = animationIndex == 0 ? translateString("heads") : translateString("tails");
@@ -143,16 +174,34 @@
                             document.title = ". ".repeat(Math.floor((i % 9) / 3) + 1);
                         }
                         
-                        if (i == framesData.length - 1) {
-                            playingAnimation = false;
+                        if (i >= framesData.length - 1) {
+                            coinPic.dataset.animationPlaying = false;
+                            coinPic.style.zIndex = coinPicZIndex;
+                            playingOneSound = false;
+                            if (coinPic.dataset.autoToss == "true"){
+                                flipCoin(coinPic);
+                            }
                         }
                     };
-                    if (i == 0) func();
-                    else setTimeout(func, animationMsDelay * i);
+                    if (i == 0) func(null);
+                    else if (coinPic.dataset.animationPlaying == "true") setTimeout(func, animationMsDelay/speedMultiplier * i);
                 }
             }
         });
     }
+
+    function setAutoToss(coinPic) {
+        var evtobj = window.event;
+        console.log(evtobj);
+        evtobj.preventDefault();
+        if (coinPic.dataset.autoToss == "true") {
+            coinPic.dataset.autoToss == "false";
+        }
+        else {
+            coinPic.dataset.autoToss == "true";
+        }
+    }
+
     function loadAnimationsJson() {
         return fetch(`./assets/animations/animations.json`)
             .then(response => {
@@ -170,6 +219,34 @@
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
+
+    function addCoin() {
+        var container = document.getElementsByClassName("coinContainer")[0];
+
+        let newAudioPlayerId = 1;
+        let idString = `coinAudioPlayer${newAudioPlayerId}`;
+        while (document.getElementById(idString) !== null){
+            newAudioPlayerId += 1;
+            idString = `coinAudioPlayer${newAudioPlayerId}`;
+        }
+        
+        const imgElement = document.createElement("img");
+        container.appendChild(imgElement);
+        imgElement.outerHTML = `<img class="coinPicture" data-auto-toss="false" data-animation-playing="false" data-audio-player-id="coinAudioPlayer${newAudioPlayerId}" onclick="flipCoin(this)" onrightclick="setAutoToss(this)">`;
+        
+        // apparently after setting the outer html, the element kills itself and the imgelement stays old, so i need to get an updated version. html is so weird man
+        const newImgElement = container.querySelector(`.coinPicture[data-audio-player-id="coinAudioPlayer${newAudioPlayerId}"]`);
+        
+        var audioElement = document.createElement("audio");
+        container.appendChild(audioElement);
+        audioElement.outerHTML = `<audio id="coinAudioPlayer${newAudioPlayerId}" src="assets/audio/flip.mp3"></audio>`;
+        
+        var maxInRow = 3;
+        var coinCount = document.getElementsByClassName("coinPicture").length > maxInRow ? maxInRow : document.getElementsByClassName("coinPicture").length;
+        root.style.setProperty('--coin-count', coinCount);
+
+        flipCoin(newImgElement);
+    }
     
     const statsCountAllLabel = document.getElementById("statsCountAllLabel");
     const statsCountHeadsLabel = document.getElementById("statsCountHeadsLabel");
@@ -177,19 +254,18 @@
     
     const addAllVisually = () =>
     {
-        statsCountAllLabel.textContent = countHeads + countTails + 1;
+        countAll++;
+        statsCountAllLabel.textContent = countAll;
     };
     const addHeads = () =>
     {
         countHeads++;
         statsCountHeadsLabel.textContent = countHeads;
-        statsCountAllLabel.textContent = countHeads + countTails;
     };
     const addTails = () =>
     {
         countTails++;
         statsCountTailsLabel.textContent = countTails;
-        statsCountAllLabel.textContent = countHeads + countTails;
     };
 
     function showMenu() {
@@ -208,15 +284,25 @@
     function keyDownHandler(e) {
         var evtobj = window.event ? window.event : e;
         if (evtobj.keyCode == 90 || evtobj.keyCode == 32 || evtobj.keyCode == 13) { // z, space, enter
-            flipCoin(picture);
+            flipAll();
         }
-        if (evtobj.keyCode == 88) { // x
+        else if (evtobj.keyCode == 61) { // + (=)
+            addCoin();
+        }
+        else if (evtobj.keyCode == 88) { // x
             showMenu();
         }
     }
     window.addEventListener('keydown', keyDownHandler);
 
-    document.onload += flipCoin(picture);
+    function flipAll() {
+        var list = document.getElementsByClassName("coinPicture");
+        for (let element of list) flipCoin(element, true);
+    }
+
+    //document.onload += addCoin();
+    window.addEventListener("DOMContentLoaded", addCoin);
+    //document.onload += flipAll();
 
 </script>
 

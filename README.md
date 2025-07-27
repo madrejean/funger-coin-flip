@@ -1,2 +1,3 @@
-# funger-coin-flip
+# fear & hunger coin flipper
+website for flipping the coin from fear & hunger series
 available at https://sierra-madre.github.io/funger-coin-flip/
